@@ -131,9 +131,9 @@ class _HabitTimerDialogState extends ConsumerState<HabitTimerDialog> {
 
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -143,7 +143,7 @@ class _HabitTimerDialogState extends ConsumerState<HabitTimerDialog> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: Colors.grey.shade400.withOpacity(0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -167,18 +167,18 @@ class _HabitTimerDialogState extends ConsumerState<HabitTimerDialog> {
                   children: [
                     Text(
                       widget.habit.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text(
+                    Text(
                       'Set Timer & Push Notification Alert 🔔',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -217,7 +217,7 @@ class _HabitTimerDialogState extends ConsumerState<HabitTimerDialog> {
                     style: TextStyle(
                       fontSize: 38,
                       fontWeight: FontWeight.bold,
-                      color: _isFinished ? AppColors.success : AppColors.textPrimary,
+                      color: _isFinished ? AppColors.success : Theme.of(context).colorScheme.onSurface,
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -244,14 +244,14 @@ class _HabitTimerDialogState extends ConsumerState<HabitTimerDialog> {
 
           // Preset Buttons Row
           if (!_isRunning) ...[
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Select Timer Duration:',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                 ),
               ),
             ),
@@ -268,7 +268,7 @@ class _HabitTimerDialogState extends ConsumerState<HabitTimerDialog> {
                       selected: isSelected,
                       selectedColor: habitColor,
                       labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),

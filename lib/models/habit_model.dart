@@ -62,6 +62,31 @@ class HabitModel {
     };
   }
 
+  Map<String, dynamic> toSupabaseMap(String userId) {
+    return {
+      'id': id,
+      'user_id': userId,
+      'title': title,
+      'description': description,
+      'category': category,
+      'icon': icon,
+      'color_value': colorValue,
+      'colorValue': colorValue,
+      'frequency': frequency,
+      'reminder_time': reminderTime,
+      'target_count': targetCount,
+      'completed_today': completedToday,
+      'current_streak': currentStreak,
+      'longest_streak': longestStreak,
+      'is_archived': isArchived,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'notes': notes,
+      'completed_dates': completedDates,
+      'skipped_dates': skippedDates,
+    };
+  }
+
   factory HabitModel.fromMap(Map<String, dynamic> map, String id) {
     return HabitModel(
       id: id,
@@ -69,23 +94,27 @@ class HabitModel {
       description: map['description'] ?? '',
       category: map['category'] ?? 'Personal',
       icon: map['icon'] ?? 'star',
-      colorValue: map['colorValue'] ?? 0xFF6C63FF,
+      colorValue: map['colorValue'] ?? map['color_value'] ?? 0xFF6C63FF,
       frequency: map['frequency'] ?? 'Daily',
-      reminderTime: map['reminderTime'],
-      targetCount: map['targetCount'] ?? 1,
-      completedToday: map['completedToday'] ?? false,
-      currentStreak: map['currentStreak'] ?? 0,
-      longestStreak: map['longestStreak'] ?? 0,
-      isArchived: map['isArchived'] ?? false,
+      reminderTime: map['reminderTime'] ?? map['reminder_time'],
+      targetCount: map['targetCount'] ?? map['target_count'] ?? 1,
+      completedToday: map['completedToday'] ?? map['completed_today'] ?? false,
+      currentStreak: map['currentStreak'] ?? map['current_streak'] ?? 0,
+      longestStreak: map['longestStreak'] ?? map['longest_streak'] ?? 0,
+      isArchived: map['isArchived'] ?? map['is_archived'] ?? false,
       createdAt: map['createdAt'] != null
           ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : map['created_at'] != null
+              ? DateTime.tryParse(map['created_at'].toString()) ?? DateTime.now()
+              : DateTime.now(),
       updatedAt: map['updatedAt'] != null
           ? DateTime.tryParse(map['updatedAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : map['updated_at'] != null
+              ? DateTime.tryParse(map['updated_at'].toString()) ?? DateTime.now()
+              : DateTime.now(),
       notes: map['notes'] ?? '',
-      completedDates: List<String>.from(map['completedDates'] ?? []),
-      skippedDates: List<String>.from(map['skippedDates'] ?? []),
+      completedDates: List<String>.from(map['completedDates'] ?? map['completed_dates'] ?? []),
+      skippedDates: List<String>.from(map['skippedDates'] ?? map['skipped_dates'] ?? []),
     );
   }
 

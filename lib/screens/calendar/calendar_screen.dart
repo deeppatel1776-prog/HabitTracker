@@ -116,10 +116,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             // Date Overview Header
             Text(
               "History for ${DateFormat('EEEE, MMM d, yyyy').format(_selectedDay)}",
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
 
@@ -146,7 +146,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.success.withOpacity(0.3)),
                     ),
@@ -156,10 +156,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                         const SizedBox(width: 12),
                         Text(
                           h.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -170,16 +170,16 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
             // Missed Habits for Selected Day
             if (missedForDay.isNotEmpty) ...[
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.remove_circle_outline_rounded, color: AppColors.textMuted, size: 18),
-                  SizedBox(width: 8),
+                  const Icon(Icons.remove_circle_outline_rounded, color: AppColors.textMuted, size: 18),
+                  const SizedBox(width: 8),
                   Text(
                     'Pending / Missed Habits',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -189,20 +189,20 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.textMuted.withOpacity(0.15)),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.circle_outlined, color: AppColors.textMuted, size: 20),
+                        const Icon(Icons.circle_outlined, color: AppColors.textMuted, size: 20),
                         const SizedBox(width: 12),
                         Text(
                           h.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -215,12 +215,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Text(
+                child: Text(
                   'No habit activity recorded on this date.',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),

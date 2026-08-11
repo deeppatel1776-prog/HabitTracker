@@ -60,9 +60,8 @@ class SupabaseService {
 
     if (_client != null) {
       try {
-        final json = habit.toMap();
-        json['user_id'] = userId;
-        await _client!.from('habits').upsert(json);
+        final json = habit.toSupabaseMap(userId);
+        await _client!.from('habits').upsert(json).timeout(const Duration(seconds: 4));
       } catch (e) {
         debugPrint('Supabase saveHabit error: $e');
       }

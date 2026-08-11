@@ -1,8 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
@@ -101,7 +102,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             backgroundColor: AppColors.primary,
           ),
         );
-        Navigator.pop(context);
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/profile');
+        }
       } else {
         final errorMsg =
             ref.read(authProvider).errorMessage ?? 'Failed to update profile';
@@ -139,21 +144,39 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     ImageProvider? profileImageProvider;
     if (_imageBytes != null) {
       profileImageProvider = MemoryImage(_imageBytes!);
-    } else if (_imagePath != null &&
-        _imagePath!.isNotEmpty &&
-        File(_imagePath!).existsSync()) {
-      profileImageProvider = FileImage(File(_imagePath!));
-    } else if (user?.photoUrl != null && user!.photoUrl!.isNotEmpty) {
-      if (user.photoUrl!.startsWith('http://') ||
-          user.photoUrl!.startsWith('https://')) {
-        profileImageProvider = NetworkImage(user.photoUrl!);
-      } else if (File(user.photoUrl!).existsSync()) {
-        profileImageProvider = FileImage(File(user.photoUrl!));
+    } else {
+      final path = _imagePath ?? user?.photoUrl;
+      if (path != null && path.isNotEmpty) {
+        if (path.startsWith('http://') ||
+            path.startsWith('https://') ||
+            path.startsWith('blob:') ||
+            path.startsWith('data:')) {
+          profileImageProvider = NetworkImage(path);
+        } else if (!kIsWeb) {
+          try {
+            final file = File(path);
+            if (file.existsSync()) {
+              profileImageProvider = FileImage(file);
+            }
+          } catch (_) {}
+        }
       }
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(
+        title: const Text('Edit Profile'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/profile');
+            }
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(

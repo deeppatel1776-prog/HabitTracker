@@ -92,21 +92,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     .fade(duration: 600.ms)
                     .scale(duration: 800.ms, curve: Curves.easeOutBack),
                 const SizedBox(height: 28),
-                const Text(
+                Text(
                   'Habit Tracker',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                     letterSpacing: -0.5,
                   ),
                 ).animate().fade(delay: 300.ms, duration: 600.ms),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Build Better Habits Every Day',
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ).animate().fade(delay: 500.ms, duration: 600.ms),

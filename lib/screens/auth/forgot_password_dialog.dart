@@ -49,20 +49,20 @@ class _ForgotPasswordDialogState extends ConsumerState<ForgotPasswordDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Reset Password',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Enter your registered email address to receive password reset instructions.',
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),

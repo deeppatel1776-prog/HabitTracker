@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -52,11 +53,19 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
 
     ImageProvider? profileImageProvider;
     if (user?.photoUrl != null && user!.photoUrl!.isNotEmpty) {
-      if (user.photoUrl!.startsWith('http://') ||
-          user.photoUrl!.startsWith('https://')) {
-        profileImageProvider = NetworkImage(user.photoUrl!);
-      } else if (File(user.photoUrl!).existsSync()) {
-        profileImageProvider = FileImage(File(user.photoUrl!));
+      final url = user.photoUrl!;
+      if (url.startsWith('http://') ||
+          url.startsWith('https://') ||
+          url.startsWith('blob:') ||
+          url.startsWith('data:')) {
+        profileImageProvider = NetworkImage(url);
+      } else if (!kIsWeb) {
+        try {
+          final file = File(url);
+          if (file.existsSync()) {
+            profileImageProvider = FileImage(file);
+          }
+        } catch (_) {}
       }
     }
 
@@ -75,6 +84,11 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
         ),
       );
     });
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = Theme.of(context).colorScheme.onSurface;
+    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color ??
+        (isDark ? const Color(0xFFA0A0B2) : AppColors.textSecondary);
 
     return Scaffold(
       body: SafeArea(
@@ -97,165 +111,92 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header: User Greeting & Date
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isCompact = constraints.maxWidth < 640;
-                          return isCompact
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                      // Header: User Greeting & Date with side-by-side Profile Photo
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  dateString.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: secondaryTextColor,
+                                    letterSpacing: 1.1,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          dateString.toUpperCase(),
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textSecondary,
-                                            letterSpacing: 1.1,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
-                                              child: Image.asset(
-                                                'assets/images/logo.png',
-                                                width: 36,
-                                                height: 36,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              "Hello, $userName! 👋",
-                                              style: const TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textPrimary,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.asset(
+                                        'assets/images/logo.png',
+                                        width: 32,
+                                        height: 32,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                    const SizedBox(height: 12),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: GestureDetector(
-                                        onTap: () => context.push('/profile'),
-                                        child: Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: AppColors.primaryGradient,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: AppColors.primary
-                                                    .withOpacity(0.3),
-                                                blurRadius: 10,
-                                                offset: const Offset(0, 4),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: CircleAvatar(
-                                              radius: 22,
-                                              backgroundColor: AppColors.primary,
-                                              backgroundImage: profileImageProvider,
-                                              child: profileImageProvider == null
-                                                  ? Text(
-                                                      userName.isNotEmpty
-                                                          ? userName[0].toUpperCase()
-                                                          : 'U',
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 18,
-                                                      ),
-                                                    )
-                                                  : null,
-                                            ),
-                                          ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        "Hello, $userName! 👋",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: primaryTextColor,
                                         ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
-                                )
-                              : Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          dateString.toUpperCase(),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: () => context.push('/profile'),
+                            child: Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: AppColors.primaryGradient,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: CircleAvatar(
+                                  radius: 22,
+                                  backgroundColor: AppColors.primary,
+                                  backgroundImage: profileImageProvider,
+                                  child: profileImageProvider == null
+                                      ? Text(
+                                          userName.isNotEmpty
+                                              ? userName[0].toUpperCase()
+                                              : 'U',
                                           style: const TextStyle(
-                                            fontSize: 12,
+                                            color: Colors.white,
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.textSecondary,
-                                            letterSpacing: 1.1,
+                                            fontSize: 18,
                                           ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "Hello, $userName! 👋",
-                                          style: const TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textPrimary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    GestureDetector(
-                                      onTap: () => context.push('/profile'),
-                                      child: Container(
-                                        width: 48,
-                                        height: 48,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient: AppColors.primaryGradient,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppColors.primary
-                                                  .withOpacity(0.3),
-                                              blurRadius: 10,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Center(
-                                          child: CircleAvatar(
-                                            radius: 22,
-                                            backgroundColor: AppColors.primary,
-                                            backgroundImage: profileImageProvider,
-                                            child: profileImageProvider == null
-                                                ? Text(
-                                                    userName.isNotEmpty
-                                                        ? userName[0].toUpperCase()
-                                                        : 'U',
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 20,
-                                                    ),
-                                                  )
-                                                : null,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                        },
+                                        )
+                                      : null,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ).animate().fade().slideY(begin: -0.2, end: 0),
 
                       const SizedBox(height: 20),
@@ -267,48 +208,64 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Streak Badges Row
+                      // 4 Stat Cards Row / Grid (Responsive Side-by-Side)
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          final isCompact = constraints.maxWidth < 640;
+                          final isCompact = constraints.maxWidth < 600;
+                          final card1 = StreakBadge(
+                            streakCount: stats.currentMaxStreak,
+                            label: 'Current Streak',
+                            icon: Icons.local_fire_department_rounded,
+                            color: const Color(0xFFFF6B6B),
+                          );
+                          final card2 = StreakBadge(
+                            streakCount: stats.longestOverallStreak,
+                            label: 'Best Streak',
+                            icon: Icons.workspace_premium_rounded,
+                            color: AppColors.primary,
+                          );
+                          final card3 = StreakBadge(
+                            streakCount: stats.totalActiveHabits,
+                            label: 'Active Habits',
+                            icon: Icons.track_changes_rounded,
+                            color: const Color(0xFF8338EC),
+                          );
+                          final card4 = StreakBadge(
+                            streakCount: stats.dailyCompletionPercentage.toInt(),
+                            label: 'Completion %',
+                            icon: Icons.insights_rounded,
+                            color: AppColors.accent,
+                          );
+
                           return isCompact
                               ? Column(
                                   children: [
-                                    StreakBadge(
-                                      streakCount: stats.currentMaxStreak,
-                                      label: 'Current Streak',
-                                      icon: Icons.local_fire_department_rounded,
-                                      color: const Color(0xFFFF6B6B),
+                                    Row(
+                                      children: [
+                                        Expanded(child: card1),
+                                        const SizedBox(width: 10),
+                                        Expanded(child: card2),
+                                      ],
                                     ),
-                                    const SizedBox(height: 12),
-                                    StreakBadge(
-                                      streakCount: stats.longestOverallStreak,
-                                      label: 'Best Streak',
-                                      icon: Icons.workspace_premium_rounded,
-                                      color: AppColors.primary,
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(child: card3),
+                                        const SizedBox(width: 10),
+                                        Expanded(child: card4),
+                                      ],
                                     ),
                                   ],
                                 )
                               : Row(
                                   children: [
-                                    Expanded(
-                                      child: StreakBadge(
-                                        streakCount: stats.currentMaxStreak,
-                                        label: 'Current Streak',
-                                        icon:
-                                            Icons.local_fire_department_rounded,
-                                        color: const Color(0xFFFF6B6B),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: StreakBadge(
-                                        streakCount: stats.longestOverallStreak,
-                                        label: 'Best Streak',
-                                        icon: Icons.workspace_premium_rounded,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
+                                    Expanded(child: card1),
+                                    const SizedBox(width: 10),
+                                    Expanded(child: card2),
+                                    const SizedBox(width: 10),
+                                    Expanded(child: card3),
+                                    const SizedBox(width: 10),
+                                    Expanded(child: card4),
                                   ],
                                 );
                         },
@@ -320,7 +277,9 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.accent.withOpacity(0.08),
+                          color: isDark
+                              ? AppColors.accent.withOpacity(0.15)
+                              : AppColors.accent.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: AppColors.accent.withOpacity(0.25),
@@ -357,22 +316,20 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                                               children: [
                                                 Text(
                                                   '"${dailyQuote.text}"',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 13,
                                                     fontStyle: FontStyle.italic,
-                                                    color:
-                                                        AppColors.textPrimary,
+                                                    color: primaryTextColor,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
                                                   "— ${dailyQuote.author}",
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.bold,
-                                                    color:
-                                                        AppColors.textSecondary,
+                                                    color: secondaryTextColor,
                                                   ),
                                                 ),
                                               ],
@@ -406,20 +363,20 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                                           children: [
                                             Text(
                                               '"${dailyQuote.text}"',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 13,
                                                 fontStyle: FontStyle.italic,
-                                                color: AppColors.textPrimary,
+                                                color: primaryTextColor,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
                                               "— ${dailyQuote.author}",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.bold,
-                                                color: AppColors.textSecondary,
+                                                color: secondaryTextColor,
                                               ),
                                             ),
                                           ],
@@ -440,10 +397,10 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                             child: Container(
                               height: 48,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: AppColors.textMuted.withOpacity(0.15),
+                                  color: secondaryTextColor.withOpacity(0.15),
                                 ),
                                 boxShadow: [
                                   BoxShadow(
@@ -455,22 +412,30 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                               ),
                               child: TextField(
                                 controller: _searchController,
+                                style: TextStyle(
+                                  color: primaryTextColor,
+                                  fontSize: 14,
+                                ),
                                 onChanged: (val) {
                                   ref
                                       .read(habitFilterProvider.notifier)
                                       .setSearchQuery(val);
                                 },
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: 'Search habits...',
+                                  hintStyle: TextStyle(
+                                    color: secondaryTextColor,
+                                    fontSize: 14,
+                                  ),
                                   prefixIcon: Icon(
                                     Icons.search_rounded,
-                                    color: AppColors.textSecondary,
+                                    color: secondaryTextColor,
                                     size: 20,
                                   ),
                                   border: InputBorder.none,
                                   enabledBorder: InputBorder.none,
                                   focusedBorder: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
+                                  contentPadding: const EdgeInsets.symmetric(
                                     vertical: 12,
                                   ),
                                 ),
@@ -483,10 +448,10 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: AppColors.textMuted.withOpacity(0.15),
+                                  color: secondaryTextColor.withOpacity(0.15),
                                 ),
                                 boxShadow: [
                                   BoxShadow(
@@ -546,7 +511,9 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                               decoration: BoxDecoration(
                                 color: filterState.selectedCategory == null
                                     ? AppColors.primary
-                                    : AppColors.inputBackground,
+                                    : (isDark
+                                        ? const Color(0xFF282834)
+                                        : AppColors.inputBackground),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
@@ -554,7 +521,7 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                                 style: TextStyle(
                                   color: filterState.selectedCategory == null
                                       ? Colors.white
-                                      : AppColors.textPrimary,
+                                      : primaryTextColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
@@ -588,27 +555,27 @@ class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
                                     HabitFilterStatus.completed
                                 ? "Completed Today (${filteredHabits.length})"
                                 : "Today's Habits (${filteredHabits.length})",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: primaryTextColor,
                             ),
                           ),
                           PopupMenuButton<HabitSortOption>(
-                            child: const Row(
+                            child: Row(
                               children: [
                                 Icon(
                                   Icons.sort_rounded,
                                   size: 16,
-                                  color: AppColors.textSecondary,
+                                  color: secondaryTextColor,
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
                                   "Sort",
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.textSecondary,
+                                    color: secondaryTextColor,
                                   ),
                                 ),
                               ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/habit_category.dart';
-import '../core/constants/app_colors.dart';
 
 class CategoryChip extends StatelessWidget {
   final HabitCategory category;
@@ -16,16 +15,29 @@ class CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isSelected
+        ? Colors.white
+        : Theme.of(context).colorScheme.onSurface;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? category.color : category.color.withOpacity(0.08),
+          color: isSelected
+              ? category.color
+              : (isDark
+                  ? category.color.withOpacity(0.18)
+                  : category.color.withOpacity(0.08)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? category.color : category.color.withOpacity(0.2),
+            color: isSelected
+                ? category.color
+                : (isDark
+                    ? category.color.withOpacity(0.35)
+                    : category.color.withOpacity(0.2)),
           ),
           boxShadow: isSelected
               ? [
@@ -51,7 +63,7 @@ class CategoryChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected ? Colors.white : AppColors.textPrimary,
+                color: textColor,
               ),
             ),
           ],

@@ -19,7 +19,7 @@ class AchievementUnlockedDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       elevation: 16,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -61,19 +61,19 @@ class AchievementUnlockedDialog extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               achievement.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               achievement.description,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),

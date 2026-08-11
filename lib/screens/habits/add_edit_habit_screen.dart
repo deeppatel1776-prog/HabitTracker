@@ -120,7 +120,11 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
             ),
           );
         }
-        context.pop();
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/dashboard');
+        }
       }
     }
   }
@@ -129,13 +133,26 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.habitId != null;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Edit Habit' : 'Create New Habit'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => context.pop(),
-        ),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          context.go('/dashboard');
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(isEditing ? 'Edit Habit' : 'Create New Habit'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/dashboard');
+              }
+            },
+          ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -166,12 +183,12 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
               const SizedBox(height: 20),
 
               // Category Selector Grid
-              const Text(
+              Text(
                 'Category',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 10),
@@ -185,9 +202,13 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
                     avatar: Icon(cat.icon, size: 16, color: isSel ? Colors.white : cat.color),
                     selected: isSel,
                     selectedColor: cat.color,
-                    backgroundColor: cat.color.withOpacity(0.08),
+                    backgroundColor: isSel
+                        ? cat.color
+                        : (Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF282834)
+                            : cat.color.withOpacity(0.08)),
                     labelStyle: TextStyle(
-                      color: isSel ? Colors.white : AppColors.textPrimary,
+                      color: isSel ? Colors.white : Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
@@ -206,12 +227,12 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
               const SizedBox(height: 22),
 
               // Color Palette Picker
-              const Text(
+              Text(
                 'Theme Color',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 10),
@@ -237,7 +258,7 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
                           color: Color(colorVal),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isSel ? AppColors.textPrimary : Colors.transparent,
+                            color: isSel ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
                             width: 3,
                           ),
                           boxShadow: isSel
@@ -262,12 +283,12 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
               const SizedBox(height: 22),
 
               // Frequency Selector
-              const Text(
+              Text(
                 'Frequency',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 10),
@@ -281,9 +302,13 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
                         label: Center(child: Text(freq)),
                         selected: isSel,
                         selectedColor: AppColors.primary,
-                        backgroundColor: AppColors.inputBackground,
+                        backgroundColor: isSel
+                            ? AppColors.primary
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF282834)
+                                : AppColors.inputBackground),
                         labelStyle: TextStyle(
-                          color: isSel ? Colors.white : AppColors.textPrimary,
+                          color: isSel ? Colors.white : Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                         onSelected: (selected) {
@@ -312,16 +337,16 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.alarm_rounded, color: AppColors.primary),
-                        SizedBox(width: 12),
+                        const Icon(Icons.alarm_rounded, color: AppColors.primary),
+                        const SizedBox(width: 12),
                         Text(
                           'Daily Reminder',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -389,6 +414,7 @@ class _AddEditHabitScreenState extends ConsumerState<AddEditHabitScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

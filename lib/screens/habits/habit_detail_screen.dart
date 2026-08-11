@@ -25,10 +25,37 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final habitState = ref.watch(habitProvider);
-    final habit = habitState.habits.firstWhere(
-      (h) => h.id == widget.habitId,
-      orElse: () => habitState.habits.first,
-    );
+    final habitIndex =
+        habitState.habits.indexWhere((h) => h.id == widget.habitId);
+    if (habitIndex == -1) {
+      return PopScope(
+        canPop: context.canPop(),
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) {
+            context.go('/dashboard');
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Habit Not Found'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/dashboard');
+                }
+              },
+            ),
+          ),
+          body: const Center(
+            child: Text('This habit no longer exists.'),
+          ),
+        ),
+      );
+    }
+    final habit = habitState.habits[habitIndex];
 
     final categoryObj = HabitCategory.getById(habit.category);
     final habitColor = Color(habit.colorValue);
@@ -38,13 +65,26 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
     final totalCompleted = habit.completedDates.length;
     final totalSkipped = habit.skippedDates.length;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(habit.title),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => context.pop(),
-        ),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          context.go('/dashboard');
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(habit.title),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/dashboard');
+              }
+            },
+          ),
         actions: [
           IconButton(
             icon: const Icon(Icons.timer_outlined, color: AppColors.primary),
@@ -70,10 +110,18 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
                 } else {
                   ref.read(habitProvider.notifier).archiveHabit(habit.id);
                 }
-                context.pop();
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/dashboard');
+                }
               } else if (val == 'delete') {
                 ref.read(habitProvider.notifier).deleteHabit(habit.id);
-                context.pop();
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/dashboard');
+                }
               }
             },
             itemBuilder: (ctx) => [
@@ -143,19 +191,19 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
                         const SizedBox(height: 6),
                         Text(
                           habit.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         if (habit.description.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
                             habit.description,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -183,36 +231,43 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isCompletedToday ? "Today's Status: Done! 🎉" : "Today's Status: Pending",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isCompletedToday ? AppColors.success : AppColors.primary,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isCompletedToday ? "Today's Status: Done! 🎉" : "Today's Status: Pending",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: isCompletedToday ? AppColors.success : AppColors.primary,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        isCompletedToday
-                            ? "Keep up the momentum tomorrow!"
-                            : "Tap button to mark complete for today.",
-                        style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          isCompletedToday
+                              ? "Keep up momentum tomorrow!"
+                              : "Tap button to mark complete.",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 10),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isCompletedToday ? AppColors.success : AppColors.primary,
                       foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     ),
                     onPressed: () {
                       ref.read(habitProvider.notifier).toggleHabitCompletion(habit.id);
                     },
-                    icon: Icon(isCompletedToday ? Icons.check_rounded : Icons.add_rounded),
-                    label: Text(isCompletedToday ? 'Completed' : 'Mark Done'),
+                    icon: Icon(isCompletedToday ? Icons.check_rounded : Icons.add_rounded, size: 18),
+                    label: Text(isCompletedToday ? 'Done' : 'Mark Done'),
                   ),
                 ],
               ),
@@ -270,19 +325,19 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
             const SizedBox(height: 24),
 
             // Completion Calendar History
-            const Text(
+            Text(
               'Completion Calendar',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(color: AppColors.textMuted.withOpacity(0.15)),
               ),
@@ -348,8 +403,8 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
                           child: Center(
                             child: Text(
                               '${day.day}',
-                              style: const TextStyle(
-                                color: AppColors.textPrimary,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -364,12 +419,12 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
 
             if (habit.notes.isNotEmpty) ...[
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Notes & Motivation',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 10),
@@ -377,15 +432,15 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: AppColors.textMuted.withOpacity(0.15)),
                 ),
                 child: Text(
                   habit.notes,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                     height: 1.4,
                   ),
                 ),
@@ -396,6 +451,7 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

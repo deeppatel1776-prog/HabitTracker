@@ -19,11 +19,15 @@ class ProgressRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clampedPercent = (percentage / 100.0).clamp(0.0, 1.0);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = Theme.of(context).colorScheme.onSurface;
+    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color ??
+        (isDark ? const Color(0xFFA0A0B2) : AppColors.textSecondary);
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -33,7 +37,9 @@ class ProgressRing extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: AppColors.textMuted.withOpacity(0.12),
+          color: isDark
+              ? secondaryTextColor.withOpacity(0.15)
+              : AppColors.textMuted.withOpacity(0.12),
         ),
       ),
       child: Row(
@@ -49,25 +55,27 @@ class ProgressRing extends StatelessWidget {
               children: [
                 Text(
                   "${percentage.toInt()}%",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: primaryTextColor,
                   ),
                 ),
-                const Text(
+                Text(
                   "Done",
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
+                    color: secondaryTextColor,
                   ),
                 ),
               ],
             ),
             circularStrokeCap: CircularStrokeCap.round,
             linearGradient: AppColors.primaryGradient,
-            backgroundColor: AppColors.inputBackground,
+            backgroundColor: isDark
+                ? const Color(0xFF282834)
+                : AppColors.inputBackground,
           ),
           const SizedBox(width: 20),
           Expanded(
@@ -77,10 +85,10 @@ class ProgressRing extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: primaryTextColor,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -90,9 +98,9 @@ class ProgressRing extends StatelessWidget {
                       : percentage >= 50
                           ? "Great momentum! More than halfway there."
                           : "Keep going! Small steps lead to big wins.",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: secondaryTextColor,
                     height: 1.3,
                   ),
                 ),

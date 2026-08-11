@@ -169,6 +169,8 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: darkBackground,
+      cardColor: darkSurface,
+      dialogBackgroundColor: darkSurface,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
@@ -179,6 +181,7 @@ class AppTheme {
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: darkTextPrimary,
+        onSurfaceVariant: darkTextSecondary,
         onError: Colors.white,
       ),
       textTheme: baseTextTheme.copyWith(

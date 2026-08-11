@@ -10,12 +10,19 @@ class AchievementBadgeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = Theme.of(context).colorScheme.onSurface;
+    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color ??
+        (isDark ? const Color(0xFFA0A0B2) : AppColors.textSecondary);
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: achievement.isUnlocked
-            ? Colors.white
-            : AppColors.inputBackground.withOpacity(0.5),
+            ? Theme.of(context).cardColor
+            : (isDark
+                ? const Color(0xFF1E1E26)
+                : AppColors.inputBackground.withOpacity(0.5)),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: achievement.isUnlocked
@@ -58,7 +65,7 @@ class AchievementBadgeCard extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: achievement.isUnlocked
-                  ? AppColors.textPrimary
+                  ? primaryTextColor
                   : AppColors.textMuted,
             ),
             textAlign: TextAlign.center,
@@ -69,7 +76,7 @@ class AchievementBadgeCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               color: achievement.isUnlocked
-                  ? AppColors.textSecondary
+                  ? secondaryTextColor
                   : AppColors.textMuted,
             ),
             textAlign: TextAlign.center,

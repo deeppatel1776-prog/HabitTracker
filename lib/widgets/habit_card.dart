@@ -76,7 +76,10 @@ class HabitCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        runSpacing: 4,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -91,24 +94,29 @@ class HabitCard extends ConsumerWidget {
                                 fontWeight: FontWeight.w600,
                                 color: habitColor,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          if (habit.reminderTime != null) ...[
-                            Icon(
-                              Icons.notifications_none_rounded,
-                              size: 13,
-                              color: AppColors.textSecondary,
+                          if (habit.reminderTime != null)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.notifications_none_rounded,
+                                  size: 13,
+                                  color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  habit.reminderTime!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              habit.reminderTime!,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -118,8 +126,8 @@ class HabitCard extends ConsumerWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isCompleted
-                              ? AppColors.textSecondary
-                              : AppColors.textPrimary,
+                              ? (Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary)
+                              : Theme.of(context).colorScheme.onSurface,
                           decoration: isCompleted ? TextDecoration.lineThrough : null,
                         ),
                         maxLines: 1,
@@ -129,44 +137,56 @@ class HabitCard extends ConsumerWidget {
                         const SizedBox(height: 2),
                         Text(
                           habit.description,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                       const SizedBox(height: 6),
-                      Row(
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 10,
+                        runSpacing: 4,
                         children: [
-                          Icon(
-                            Icons.local_fire_department_rounded,
-                            size: 15,
-                            color: const Color(0xFFFF6B6B),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.local_fire_department_rounded,
+                                size: 15,
+                                color: Color(0xFFFF6B6B),
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                "${habit.currentStreak} streak",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 3),
-                          Text(
-                            "${habit.currentStreak} streak",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Icon(
-                            Icons.repeat_rounded,
-                            size: 14,
-                            color: AppColors.textMuted,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            habit.frequency,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.repeat_rounded,
+                                size: 14,
+                                color: AppColors.textMuted,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                habit.frequency,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

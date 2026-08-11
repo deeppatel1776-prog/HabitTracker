@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -69,11 +70,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     ImageProvider? profileImageProvider;
     if (user?.photoUrl != null && user!.photoUrl!.isNotEmpty) {
-      if (user.photoUrl!.startsWith('http://') ||
-          user.photoUrl!.startsWith('https://')) {
-        profileImageProvider = NetworkImage(user.photoUrl!);
-      } else if (File(user.photoUrl!).existsSync()) {
-        profileImageProvider = FileImage(File(user.photoUrl!));
+      final url = user.photoUrl!;
+      if (url.startsWith('http://') ||
+          url.startsWith('https://') ||
+          url.startsWith('blob:') ||
+          url.startsWith('data:')) {
+        profileImageProvider = NetworkImage(url);
+      } else if (!kIsWeb) {
+        try {
+          final file = File(url);
+          if (file.existsSync()) {
+            profileImageProvider = FileImage(file);
+          }
+        } catch (_) {}
       }
     }
 
@@ -154,10 +163,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Expanded(
                               child: Text(
                                 userName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -174,9 +183,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         const SizedBox(height: 4),
                         Text(
                           userEmail,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -242,12 +251,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 24),
 
             // Settings & Preferences Card
-            const Text(
+            Text(
               'Settings & Preferences',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),
@@ -314,9 +323,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.archive_outlined,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                     ),
                     title: const Text(
                       'Archived Habits',
@@ -440,12 +449,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Achievements & Badges',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 Text(

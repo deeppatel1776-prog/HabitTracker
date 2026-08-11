@@ -52,7 +52,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -74,10 +74,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                             : _period == ChartPeriod.monthly
                                 ? '30-Day Completion Trend'
                                 : 'Yearly Overview',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Container(
@@ -115,7 +115,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                               reservedSize: 28,
                               getTitlesWidget: (val, meta) => Text(
                                 val.toInt().toString(),
-                                style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                                ),
                               ),
                             ),
                           ),
@@ -145,12 +148,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'Performance Summary',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 14),
@@ -217,6 +220,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
   Widget _buildPeriodTab(String title, ChartPeriod period) {
     final isSelected = _period == period;
+    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -226,7 +231,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
+            color: isSelected ? Theme.of(context).cardColor : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             boxShadow: isSelected
                 ? [
@@ -244,7 +249,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                color: isSelected ? AppColors.primary : secondaryTextColor,
               ),
             ),
           ),
@@ -269,18 +274,19 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   Widget _getBottomTitle(int index) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary;
 
     if (_period == ChartPeriod.weekly) {
       if (index >= 0 && index < days.length) {
-        return Text(days[index], style: const TextStyle(fontSize: 11, color: AppColors.textSecondary));
+        return Text(days[index], style: TextStyle(fontSize: 11, color: secondaryTextColor));
       }
     } else if (_period == ChartPeriod.yearly) {
       if (index >= 0 && index < months.length) {
-        return Text(months[index], style: const TextStyle(fontSize: 11, color: AppColors.textSecondary));
+        return Text(months[index], style: TextStyle(fontSize: 11, color: secondaryTextColor));
       }
     } else {
       if (index % 5 == 0 && index < 30) {
-        return Text("${index + 1}", style: const TextStyle(fontSize: 10, color: AppColors.textSecondary));
+        return Text("${index + 1}", style: TextStyle(fontSize: 10, color: secondaryTextColor));
       }
     }
     return const SizedBox();
@@ -312,10 +318,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color, String subtitle) {
+    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.textMuted.withOpacity(0.12)),
         boxShadow: [
@@ -344,10 +352,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: secondaryTextColor,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
